@@ -1,6 +1,7 @@
 import exporess from "express";
 import cors from "cors";
 import logger from "./config/logger";
+import userRouter from "./routes/user.router";
 
 const app = exporess();
 
@@ -13,5 +14,8 @@ app.get("/", (req, res) => {
   logger.info("Root route running");
   res.send("Hospital Api running");
 });
+
+//user routes
+app.use("/api/users", userRouter);
 
 export default app;
