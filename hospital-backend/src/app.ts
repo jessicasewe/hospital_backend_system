@@ -2,6 +2,7 @@ import exporess from "express";
 import cors from "cors";
 import logger from "./config/logger";
 import userRouter from "./routes/user.router";
+import doctorNoteRouter from "./routes/doctor-note.router";
 
 const app = exporess();
 
@@ -17,5 +18,8 @@ app.get("/", (req, res) => {
 
 //user routes
 app.use("/api/users", userRouter);
+
+//doctor-note routes
+app.use("/api", doctorNoteRouter);
 
 export default app;
