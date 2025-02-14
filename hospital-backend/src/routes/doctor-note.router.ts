@@ -3,6 +3,7 @@ import { check, body } from "express-validator";
 import {
   submitDoctorNote,
   getDoctorNotes,
+  getActionableStepsForPatient,
 } from "../controllers/doctor-note.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
@@ -23,6 +24,13 @@ doctorNoteRouter.get(
   authMiddleware as any,
   [check("patientId", "Invalid patient ID").not().isEmpty()],
   getDoctorNotes as any
+);
+
+doctorNoteRouter.get(
+  "/actionable-steps/:patientId",
+  authMiddleware as any,
+  [check("patientId", "Invalid patient ID").not().isEmpty()],
+  getActionableStepsForPatient as any
 );
 
 export default doctorNoteRouter;
