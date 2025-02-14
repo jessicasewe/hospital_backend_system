@@ -70,7 +70,7 @@ This project is a backend system for a hospital that handles user signups, patie
    npm run dev
    ```
 
-   The server will start on `http://localhost:3000`.
+   The server will start on `http://localhost:5000`.
 
 ## API Documentation
 
@@ -276,7 +276,7 @@ Here’s a breakdown of why I made certain design choices for the **Hospital Bac
 - Integration tests for API endpoints.
 
 ## Postman Collection  
-You can test the API using this **[Postman Collection](https://interstellar-star-542533.postman.co/workspace/project-test~c73c23ac-a0aa-484b-b2c5-21f07a4a0ef1/collection/25286067-f0bcab50-0c2d-4bba-898d-3d29cdace9c5?action=share&creator=25286067)**.
+You can test the API using this **[Postman Collection]([https://interstellar-star-542533.postman.co/workspace/project-test~c73c23ac-a0aa-484b-b2c5-21f07a4a0ef1/collection/25286067-f0bcab50-0c2d-4bba-898d-3d29cdace9c5?action=share&creator=25286067](https://documenter.getpostman.com/view/25286067/2sAYXEDHnG))**.
 
 
 
