@@ -147,14 +147,6 @@ This project is a backend system for a hospital that handles user signups, patie
   }
   ```
 
-## Testing
-
-To run the tests, use the following command:
-
-```bash
-npm test
-```
-
 ## Technologies Used
 
 - **Node.js**: Backend runtime environment.
@@ -162,7 +154,6 @@ npm test
 - **MongoDB**: Database for storing user data, notes, and reminders.
 - **JWT**: For secure authentication.
 - **Google Gemini**: For extracting actionable steps from doctor notes.
-- **Jest & Supertest**: For testing the API.
 
 # Design Decisions  
 
@@ -282,7 +273,11 @@ Here’s a breakdown of why I made certain design choices for the **Hospital Bac
 
 ## **10. Testing**
 ### How it works:  
-- Integration tests for API endpoints.  
+- Integration tests for API endpoints.
+
+## Postman Collection  
+You can test the API using this **[Postman Collection]([https://www.postman.com/your-collection-link](https://interstellar-star-542533.postman.co/workspace/project-test~c73c23ac-a0aa-484b-b2c5-21f07a4a0ef1/collection/25286067-f0bcab50-0c2d-4bba-898d-3d29cdace9c5?action=share&creator=25286067))**.
+
 
 
 ## Contributing
