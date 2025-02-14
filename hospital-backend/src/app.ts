@@ -3,6 +3,7 @@ import cors from "cors";
 import logger from "./config/logger";
 import userRouter from "./routes/user.router";
 import doctorNoteRouter from "./routes/doctor-note.router";
+import reminderRouter from "./routes/reminder.router";
 
 const app = exporess();
 
@@ -21,5 +22,8 @@ app.use("/api/users", userRouter);
 
 //doctor-note routes
 app.use("/api", doctorNoteRouter);
+
+//reminder routes
+app.use("/api", reminderRouter);
 
 export default app;
