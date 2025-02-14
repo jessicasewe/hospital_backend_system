@@ -56,7 +56,7 @@ This project is a backend system for a hospital that handles user signups, patie
    Create a `.env` file in the root directory and add the following variables:
 
    ```env
-   PORT=3000
+   PORT=5000
    MONGODB_URI=mongodb://localhost:27017/hospital
    JWT_SECRET=your_jwt_secret
    REFRESH_TOKEN_SECRET=your_refresh_token_secret
