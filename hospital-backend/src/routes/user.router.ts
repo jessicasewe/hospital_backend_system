@@ -1,6 +1,12 @@
 import express from "express";
 import { check, body } from "express-validator";
-import { register, login, selectDoctor } from "../controllers/auth.controller";
+import {
+  register,
+  login,
+  refreshToken,
+  logout,
+  selectDoctor,
+} from "../controllers/auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
 const userRouter = express.Router();
@@ -34,6 +40,8 @@ userRouter.post(
   login as any
 );
 
+userRouter.post("/refresh-token", refreshToken as any); // Add this line
+userRouter.post("/logout", logout as any); // Add this line
 userRouter.post("/select-doctor", authMiddleware as any, selectDoctor as any);
 
 export default userRouter;

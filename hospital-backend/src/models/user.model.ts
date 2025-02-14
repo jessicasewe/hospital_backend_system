@@ -30,6 +30,10 @@ const userSchema = new Schema({
     ref: "User",
     default: null,
   },
+  refreshToken: {
+    type: String,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
