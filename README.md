@@ -164,6 +164,127 @@ npm test
 - **Google Gemini**: For extracting actionable steps from doctor notes.
 - **Jest & Supertest**: For testing the API.
 
+# Design Decisions  
+
+Here’s a breakdown of why I made certain design choices for the **Hospital Backend System**—focused on security, scalability, and making life easier for both patients and doctors.  
+
+---
+
+## **1. Authentication**  
+### Why JWT?  
+- **No Session Storage Hassle** – JWTs are stateless, so the server doesn’t need to store session data.  
+- **Security First** – Tokens are signed with `JWT_SECRET`, making them tamper-proof.  
+- **Short-Lived for Safety** – Access tokens expire in 1 hour, refresh tokens in 7 days to limit risk.  
+
+### How it works:  
+1. User logs in → gets an **access & refresh token**.  
+2. The access token handles API requests.  
+3. When it expires, the refresh token gets a new one—no need to log in again.  
+
+---
+
+## **2. Encryption**  
+### Why AES-256-CBC?  
+- **Privacy is Non-Negotiable** – Medical data is sensitive. Encryption ensures only the right people can read it.  
+- **Even if the DB is Hacked, It's Useless** – Without the key, the data is unreadable.  
+
+### How it works:  
+- Doctor notes are encrypted using **AES-256-CBC**.  
+- Each patient-doctor pair has a unique key, derived from their IDs and a master key (`ENCRYPTION_KEY`).  
+- That key **is never stored** in the database—only authorized users can decrypt.  
+
+---
+
+## **3. Scheduling Strategy**  
+### Why Dynamic Scheduling?  
+- **Patients Forget, The System Doesn’t** – If someone misses a reminder, it adjusts the schedule.  
+- **Automates Everything** – No manual tracking needed.  
+
+### How it works:  
+- Google Gemini extracts a **Checklist & Plan** from doctor notes.  
+- **Checklist** = Immediate actions (e.g., buy meds).  
+- **Plan** = Scheduled tasks (e.g., take meds daily for 7 days).  
+- **node-cron** schedules reminders, which are stored in the database.  
+
+---
+
+## **4. Data Storage**  
+### Why MongoDB?  
+- **Schema-less = Flexibility** – Can easily store different types of medical data.  
+- **Scalable** – Handles large hospital systems with ease.  
+- **Fast Reads & Writes** – Important for real-time access to patient records.  
+
+### Collections:  
+- **Users** – Stores patient/doctor info.  
+- **Doctor Notes** – Stores encrypted notes.  
+- **Reminders** – Manages scheduled actions.  
+
+---
+
+## **5. LLM Integration**  
+### Why Google Gemini?  
+- **Accuracy** – Parses unstructured doctor notes and extracts real tasks.  
+- **Easy to Work With** – API is simple to integrate and gives consistent results.  
+
+### How it works:  
+1. Doctor notes are sent to Gemini.  
+2. It returns **Checklist & Plan** in JSON format.  
+3. The system processes this and schedules tasks accordingly.  
+
+---
+
+## **6. Logging**  
+### Why Winston?  
+- **Structured & Searchable Logs** – Helps with debugging.  
+- **Multiple Outputs** – Can log to console, files, or external tools.  
+
+### How it works:  
+- Logs are stored in the `logs/` folder.  
+- Two main logs:  
+  - `cron.log` → Tracks scheduled jobs.  
+  - `error.log` → Captures errors for debugging.  
+
+---
+
+## **7. Error Handling**  
+### Why Centralized Error Handling?  
+- **Consistent Error Responses** – Clients get clear, standard messages.  
+- **No Leaking Sensitive Info** – API only returns necessary details.  
+
+### How it works:  
+- All errors are logged using Winston.  
+- API sends a simple response (e.g., “Something went wrong”), while detailed logs go to the server.  
+
+---
+
+## **8. API Design**  
+### Why RESTful API?  
+- **Simple & Clean** – Easy to use and expand.  
+- **Works on Any Platform** – Web, mobile, or third-party integrations.  
+
+### How it works:  
+- **POST** – Creating resources (register, login, submit note).  
+- **GET** – Retrieving data (notes, reminders).  
+- **PUT** – Updating data (marking reminders complete).  
+
+---
+
+## **9. Security**  
+### Why bcrypt for Passwords?  
+- **Standard for Secure Hashing** – Resistant to brute-force attacks.  
+- **Built-in Salting** – Adds an extra layer of protection.  
+
+### How it works:  
+- Passwords are hashed with bcrypt before being stored.  
+- Salt rounds set to 10 for optimal security vs. performance.  
+
+---
+
+## **10. Testing**
+### How it works:  
+- Integration tests for API endpoints.  
+
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
