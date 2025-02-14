@@ -12,6 +12,14 @@ export const register = async (req: Request, res: Response) => {
 
   const { name, email, password, role, specialization, doctorId } = req.body;
 
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      msg: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+    });
+  }
+
   try {
     let userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ msg: "User already exists" });
@@ -52,7 +60,6 @@ export const register = async (req: Request, res: Response) => {
       await newPatient.save();
       logger.info(`New patient registered: ${email}`);
 
-      // Return list of doctors for selection
       const doctors = await User.find({ role: "doctor" }).select(
         "name email specialization"
       );
@@ -63,6 +70,7 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
+    // Explicitly return a message for invalid roles
     return res.status(400).json({ msg: "Invalid role specified" });
   } catch (err) {
     logger.error("Error in registration: " + err);
@@ -80,20 +88,30 @@ export const login = async (req: Request, res: Response) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid credentials" });
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: "1h" }
     );
 
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      process.env.REFRESH_TOKEN_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
     let response: {
-      token: string;
+      accessToken: string;
+      refreshToken: string;
       msg: string;
       role: "doctor" | "patient";
       doctors?: any;
       assignedPatients?: any;
       assignedDoctor?: any;
-    } = { token, msg: "Login successful", role: user.role };
+    } = { accessToken, refreshToken, msg: "Login successful", role: user.role };
 
     if (user.role === "patient") {
       if (!user.doctorId) {
@@ -114,7 +132,6 @@ export const login = async (req: Request, res: Response) => {
       }
     }
 
-    // If the user is a doctor
     if (user.role === "doctor") {
       const assignedPatients = await User.find({ doctorId: user.id }).select(
         "name email"
@@ -127,6 +144,57 @@ export const login = async (req: Request, res: Response) => {
     res.status(200).json(response);
   } catch (err) {
     logger.error("Error in login: " + err);
+    res.status(500).send("Server error");
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken)
+    return res.status(400).json({ msg: "Refresh token is required" });
+
+  try {
+    const user = await User.findOne({ refreshToken });
+    if (!user) return res.status(400).json({ msg: "Invalid refresh token" });
+
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET!,
+      (err: any, decoded: any) => {
+        if (err) return res.status(400).json({ msg: "Invalid refresh token" });
+
+        const accessToken = jwt.sign(
+          { userId: decoded.userId, role: user.role },
+          process.env.JWT_SECRET!,
+          { expiresIn: "1h" }
+        );
+
+        res.status(200).json({ accessToken });
+      }
+    );
+  } catch (err) {
+    logger.error("Error refreshing token: " + err);
+    res.status(500).send("Server error");
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken)
+    return res.status(400).json({ msg: "Refresh token is required" });
+
+  try {
+    const user = await User.findOne({ refreshToken });
+    if (!user) return res.status(400).json({ msg: "Invalid refresh token" });
+
+    user.refreshToken = "";
+    await user.save();
+
+    res.status(200).json({ msg: "Logged out successfully" });
+  } catch (err) {
+    logger.error("Error in logout: " + err);
     res.status(500).send("Server error");
   }
 };
