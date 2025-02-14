@@ -273,6 +273,7 @@ Here’s a breakdown of why I made certain design choices for the **Hospital Bac
 
 ## **10. Testing**
 ### How it works:  
+- Tests scripts to test controllers
 - Integration tests for API endpoints.
 
 ## Postman Collection  
